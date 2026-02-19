@@ -1,31 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>Cloudmall Dictionary</title>
+
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<style>
+body{
+font-family: Arial;
+padding:20px;
+}
+
+button{
+background:#6a5cff;
+color:white;
+border:none;
+padding:12px 25px;
+border-radius:10px;
+font-size:18px;
+}
+
+#msg{
+margin-top:20px;
+font-weight:bold;
+}
+</style>
+
 </head>
 
 <body>
 
-<h2>Cloudmall Dictionary App</h2>
+<h2>Cloudmall Dictionary</h2>
 
-<button onclick="pay()">Pay 0.01 Pi</button>
+<button id="payBtn" onclick="pay()">Pay 0.01 Pi</button>
+
+<div id="msg"></div>
 
 <script>
+
 Pi.init({ version: "2.0", sandbox: true });
 
-async function pay() {
+async function pay(){
+
+document.getElementById("msg").innerText="Processing payment...";
+
 try {
+
 const payment = await Pi.createPayment({
 amount: 0.01,
-memo: "Cloudmall Dictionary Test",
-metadata: { type: "test" }
+memo: "Unlock premium dictionary",
+metadata: { type: "unlock" }
 });
-console.log(payment);
+
+document.getElementById("msg").innerText="✅ Payment success";
+
+localStorage.setItem("premium","true");
+unlockFeatures();
+
 } catch(e) {
+document.getElementById("msg").innerText="❌ Payment failed";
 console.log(e);
 }
+
 }
+
+function unlockFeatures(){
+if(localStorage.getItem("premium")=="true"){
+document.getElementById("msg").innerText="⭐ Premium unlocked";
+document.getElementById("payBtn").style.display="none";
+}
+}
+
+unlockFeatures();
+
 </script>
 
 </body>
