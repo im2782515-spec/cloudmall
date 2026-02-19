@@ -9,35 +9,41 @@
 
 <h2>Cloudmall Dictionary Payment Test</h2>
 
-<button onclick="login()" style="padding:15px;font-size:18px">Login Pi</button>
+<button onclick="login()">Login Pi</button>
 <br><br>
-
-<button onclick="pay()" style="padding:15px;font-size:18px">Test Payment</button>
+<button onclick="pay()">Test Payment</button>
 
 <script>
 Pi.init({ version: "2.0", sandbox: true });
 
 async function login(){
-try{
 await Pi.authenticate(['payments'], function(){});
-alert("Login success");
-}catch(e){
-alert("Login error");
-}
+alert("login ok");
 }
 
 async function pay(){
-try{
-await Pi.createPayment({
+Pi.createPayment(
+{
 amount: 0.01,
 memo: "Cloudmall Test",
-metadata: {type:"test"}
-});
-alert("Payment opened");
-}catch(e){
-console.log(e);
-alert("Done");
+metadata: { type:"test" }
+},
+{
+onReadyForServerApproval: function(paymentId){
+console.log(paymentId);
+},
+onReadyForServerCompletion: function(paymentId, txid){
+console.log(txid);
+},
+onCancel: function(paymentId){
+alert("cancelled");
+},
+onError: function(error, payment){
+alert("error");
+console.log(error);
 }
+}
+);
 }
 </script>
 
