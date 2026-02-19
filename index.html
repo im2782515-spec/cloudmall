@@ -1,41 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Cloudmall Dictionary</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
+
+<body style="text-align:center;font-family:sans-serif">
+
+<h2>Cloudmall Dictionary Payment Test</h2>
+
+<button onclick="login()" style="padding:15px;font-size:18px">Login Pi</button>
+<br><br>
+
+<button onclick="pay()" style="padding:15px;font-size:18px">Test Payment</button>
 
 <script>
 Pi.init({ version: "2.0", sandbox: true });
 
-async function pay() {
-  try {
-    const payment = await Pi.createPayment(
-      {
-        amount: 0.01,
-        memo: "Cloudmall Dictionary Test",
-        metadata: { type: "test" }
-      },
-      {
-        onReadyForServerApproval: function(paymentId) {
-          console.log("Approve payment on server:", paymentId);
-        },
-        onReadyForServerCompletion: function(paymentId, txid) {
-          console.log("Complete payment on server:", paymentId, txid);
-        },
-        onCancel: function(paymentId) {
-          console.log("Payment cancelled:", paymentId);
-        },
-        onError: function(error, payment) {
-          console.log("Payment error:", error);
-        }
-      }
-    );
+async function login(){
+try{
+await Pi.authenticate(['payments'], function(){});
+alert("Login success");
+}catch(e){
+alert("Login error");
+}
+}
 
-    console.log(payment);
-  } catch (e) {
-    console.log(e);
-  }
+async function pay(){
+try{
+await Pi.createPayment({
+amount: 0.01,
+memo: "Cloudmall Test",
+metadata: {type:"test"}
+});
+alert("Payment opened");
+}catch(e){
+console.log(e);
+alert("Done");
+}
 }
 </script>
 
-<button onclick="pay()">Pay with Pi</button>
+</body>
+</html>
