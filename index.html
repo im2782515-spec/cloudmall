@@ -1,52 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
 <title>Cloudmall Dictionary</title>
 
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-<style>
-body{
-font-family: Arial;
-padding:20px;
-}
+<script>
+Pi.init({ version: "2.0", sandbox: true });
 
-button{
-background:#6a5cff;
-color:white;
-border:none;
-padding:12px 25px;
-border-radius:10px;
-font-size:18px;
-}
+async function pay(){
+try {
+alert("start");
 
-#msg{
-margin-top:20px;
-font-weight:bold;
+const payment = await Pi.createPayment({
+amount: 0.01,
+memo: "Cloudmall Dictionary Test",
+metadata: { type: "test" }
+});
+
+alert("success");
+
+} catch(e){
+alert("error: "+JSON.stringify(e));
+console.log(e);
 }
-</style>
+}
+</script>
 
 </head>
 
 <body>
 
-<h2>Cloudmall Dictionary</h2>
-async function pay(){
-try {
+<h1>Cloudmall Dictionary App</h1>
+<p>App is working ✅</p>
 
-alert("start");
+<button onclick="pay()">Pay 0.01 Pi</button>
 
-const payment = await Pi.createPayment({
-amount: 0.01,
-memo: "test",
-metadata: { test: true }
-});
-
-alert("success");
-
-} catch(e) {
-alert("error: "+JSON.stringify(e));
-console.log(e);
-}
-}
+</body>
+</html>
