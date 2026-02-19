@@ -5,25 +5,37 @@
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <script>
-Pi.init({ version:"2.0", sandbox:true });
+Pi.init({ version: "2.0", sandbox: true });
 
-async function pay(){
-try{
+async function pay() {
+  try {
+    const payment = await Pi.createPayment(
+      {
+        amount: 0.01,
+        memo: "Cloudmall Dictionary Test",
+        metadata: { type: "test" }
+      },
+      {
+        onReadyForServerApproval: function(paymentId) {
+          console.log("Approve payment on server:", paymentId);
+        },
+        onReadyForServerCompletion: function(paymentId, txid) {
+          console.log("Complete payment on server:", paymentId, txid);
+        },
+        onCancel: function(paymentId) {
+          console.log("Payment cancelled:", paymentId);
+        },
+        onError: function(error, payment) {
+          console.log("Payment error:", error);
+        }
+      }
+    );
 
-const scopes = ['username','payments'];
-await Pi.authenticate(scopes, function(payment){}, function(error){});
-
-const payment = await Pi.createPayment({
-amount:0.01,
-memo:"Cloudmall test",
-metadata:{test:true}
-});
-
-alert("success");
-
-}catch(e){
-alert("error: "+JSON.stringify(e));
-console.log(e);
-}
+    console.log(payment);
+  } catch (e) {
+    console.log(e);
+  }
 }
 </script>
+
+<button onclick="pay()">Pay with Pi</button>
