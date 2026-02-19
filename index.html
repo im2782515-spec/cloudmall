@@ -32,49 +32,21 @@ font-weight:bold;
 <body>
 
 <h2>Cloudmall Dictionary</h2>
-
-<button id="payBtn" onclick="pay()">Pay 0.01 Pi</button>
-
-<div id="msg"></div>
-
-<script>
-
-Pi.init({ version: "2.0", sandbox: true });
-
 async function pay(){
-
-document.getElementById("msg").innerText="Processing payment...";
-
 try {
+
+alert("start");
 
 const payment = await Pi.createPayment({
 amount: 0.01,
-memo: "Unlock premium dictionary",
-metadata: { type: "unlock" }
+memo: "test",
+metadata: { test: true }
 });
 
-document.getElementById("msg").innerText="✅ Payment success";
-
-localStorage.setItem("premium","true");
-unlockFeatures();
+alert("success");
 
 } catch(e) {
-document.getElementById("msg").innerText="❌ Payment failed";
+alert("error: "+JSON.stringify(e));
 console.log(e);
 }
-
 }
-
-function unlockFeatures(){
-if(localStorage.getItem("premium")=="true"){
-document.getElementById("msg").innerText="⭐ Premium unlocked";
-document.getElementById("payBtn").style.display="none";
-}
-}
-
-unlockFeatures();
-
-</script>
-
-</body>
-</html>
