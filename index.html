@@ -8,3 +8,24 @@
 <p>App is working ✅</p>
 </body>
 </html>
+<button onclick="pay()" style="padding:12px 20px;font-size:16px;border:none;background:#6a5cff;color:white;border-radius:8px;">
+Pay 0.01 Pi
+</button>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<script>
+Pi.init({ version: "2.0" });
+
+async function pay() {
+try {
+const payment = await Pi.createPayment({
+amount: 0.01,
+memo: "Dictionary Test Payment",
+metadata: { type: "test" }
+});
+console.log(payment);
+} catch(e) {
+console.log(e);
+}
+}
+</script>
