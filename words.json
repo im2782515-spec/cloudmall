@@ -1,13 +1,6 @@
 [
-  { "word": "Hello", "definition": "مرحبا", "category": "Common" },
-  { "word": "World", "definition": "العالم", "category": "Common" },
-  { "word": "Book", "definition": "كتاب", "category": "School" },
-  { "word": "Computer", "definition": "حاسوب", "category": "Tech" },
-  { "word": "Phone", "definition": "هاتف", "category": "Tech" },
-  { "word": "School", "definition": "مدرسة", "category": "School" },
-  { "word": "Teacher", "definition": "معلم", "category": "School" },
-  { "word": "Internet", "definition": "الإنترنت", "category": "Tech" },
-  { "word": "Food", "definition": "طعام", "category": "Common" },
-  { "word": "Water", "definition": "ماء", "category": "Common" }
-  // وهكذا حتى 1000 كلمة مصنفة
+  {"word":"hello","meaning":"مرحبا"},
+  {"word":"book","meaning":"كتاب"},
+  {"word":"school","meaning":"مدرسة"},
+  {"word":"car","meaning":"سيارة"}
 ]
