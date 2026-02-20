@@ -84,3 +84,99 @@ document.getElementById("payBtn").addEventListener("click", async () => {
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloudmall Dictionary</title>
+
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background:#f4f4f9; }
+  h1 { color: #333; margin-bottom: 20px; }
+  input, select { padding: 10px; width: 300px; margin: 5px; border-radius:5px; border:1px solid #ccc; }
+  ul { list-style: none; padding: 0; max-width: 500px; margin: auto; }
+  li { padding: 8px; background: #fff; margin-bottom: 5px; border-radius:5px; text-align:left; box-shadow:0 0 5px rgba(0,0,0,0.1); }
+  button { padding: 10px 20px; font-size: 16px; cursor: pointer; border:none; background:#4CAF50; color:white; border-radius:5px; }
+  button:hover { background:#45a049; }
+</style>
+</head>
+
+<body>
+
+<h1>Cloudmall Dictionary</h1>
+
+<!-- شريط البحث -->
+<input type="text" id="searchBox" placeholder="ابحث عن كلمة...">
+
+<!-- اختيار التصنيف -->
+<select id="categorySelect">
+  <option value="All">الكل</option>
+  <option value="Common">كلمات شائعة</option>
+  <option value="Tech">تقنية</option>
+  <option value="School">مدرسة</option>
+</select>
+
+<!-- قائمة الكلمات -->
+<ul id="wordList"></ul>
+
+<!-- زر الدفع -->
+<button id="payBtn">Pay 0.01 Pi</button>
+
+<!-- الكلمات -->
+<script>
+const words = [
+  { word: "Hello", definition: "مرحبا", category: "Common" },
+  { word: "World", definition: "العالم", category: "Common" },
+  { word: "Book", definition: "كتاب", category: "School" },
+  { word: "Computer", definition: "حاسوب", category: "Tech" },
+  { word: "Phone", definition: "هاتف", category: "Tech" },
+  // يمكن استبدال هذه بخمسين كلمة أولية، أو استيراد ملف JSON فيه 1000 كلمة
+];
+
+// دالة عرض الكلمات حسب البحث والتصنيف
+function displayWords(){
+  const search = document.getElementById("searchBox").value.toLowerCase();
+  const category = document.getElementById("categorySelect").value;
+  const list = document.getElementById("wordList");
+  list.innerHTML = "";
+  words
+    .filter(w => (category === "All" || w.category === category) &&
+                 w.word.toLowerCase().includes(search))
+    .forEach(w => {
+      const li = document.createElement("li");
+      li.textContent = ${w.word} : ${w.definition};
+      list.appendChild(li);
+    });
+}
+
+// تفعيل البحث والتصنيف
+document.getElementById("searchBox").addEventListener("input", displayWords);
+document.getElementById("categorySelect").addEventListener("change", displayWords);
+
+// عرض الكلمات عند البداية
+displayWords();
+</script>
+
+<!-- Pi SDK وزر الدفع -->
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script>
+Pi.init({ version: "2.0", sandbox: true }); // sandbox للتجربة
+
+document.getElementById("payBtn").addEventListener("click", async () => {
+  try {
+    await Pi.createPayment({
+      amount: 0.01,
+      memo: "Cloudmall Dictionary Test",
+      metadata: { type: "test" }
+    });
+    alert("نافذة الدفع فتحت، العملية تمت بنجاح");
+  } catch(e){
+    console.log(e);
+    alert("حدث خطأ في الدفع");
+  }
+});
+</script>
+
+</body>
+</html>
