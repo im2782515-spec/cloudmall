@@ -48,8 +48,11 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 /* ===== Pi SDK Initialization ===== */
-Pi.init({ version: "2.0", sandbox: true });
-let currentUser = null;
+Pi.init({ 
+  version: "2.0", 
+  sandbox: true,
+  apiKey: "fkjojkkpa9wgrhwh969t1fhv34yjskkhdvynndcqr2xhyep44s7ydkmnsa7ndlui"
+});
 
 /* ===== LOGIN ===== */
 async function login() {
