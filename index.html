@@ -1,122 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>قاموسي</title>
+</head>
+
+<body>
+
+<h2>📘 القاموس</h2>
+
+<button onclick="login()">Login Pi</button>
+<br><br>
+<button onclick="pay()">ادفع 1 Pi</button>
+
+<p id="user"></p>
+
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <script>
 Pi.init({ version: "2.0", sandbox: true });
 
+let currentUser = null;
+
+/* ===== LOGIN ===== */
 async function login() {
   try {
-    const scopes = ['username', 'payments'];
+    const scopes = ['username','payments'];
     const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-    alert("تم تسجيل الدخول: " + auth.user.username);
+
+    currentUser = auth.user;
+    document.getElementById("user").innerText =
+      "مرحبا " + auth.user.username;
+
   } catch (err) {
     alert("خطأ في تسجيل الدخول");
-    console.error(err);
+    console.log(err);
   }
 }
 
+/* ===== PAYMENT ===== */
+function pay() {
+  if (!currentUser) {
+    alert("سجل دخول الاول");
+    return;
+  }
+
+  const paymentData = {
+    amount: 1,
+    memo: "Unlock dictionary",
+    metadata: { item: "dictionary" }
+  };
+
+  const callbacks = {
+    onReadyForServerApproval: (paymentId) => {
+      console.log(paymentId);
+    },
+    onReadyForServerCompletion: (paymentId, txid) => {
+      console.log(paymentId, txid);
+    },
+    onCancel: () => {
+      alert("تم الغاء الدفع");
+    },
+    onError: (error) => {
+      console.log(error);
+    }
+  };
+
+  Pi.createPayment(paymentData, callbacks);
+}
+
 function onIncompletePaymentFound(payment) {
   console.log(payment);
-}
-</script>
-<button onclick="login()">Login Pi</button>
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-<meta charset="UTF-8">
-<title>Cloudmall Dictionary</title>
-
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
-<style>
-}
-
-function onIncompletePaymentFound(payment) {
-  console.log(payment);
-}
-</script>
-body{
-font-family:Arial;
-text-align:center;
-margin-top:40px;
-}
-input{
-width:80%;
-padding:10px;
-margin:10px;
-}
-button{
-padding:12px 20px;
-margin:10px;
-background:#4CAF50;
-color:white;
-border:none;
-border-radius:6px;
-}
-#result{
-margin-top:20px;
-font-size:20px;
-}
-</style>
-</head>
-
-<body>
-
-<h1>Cloudmall Dictionary</h1>
-
-<button onclick="login()">Login Pi</button>
-<br>
-
-<input id="word" placeholder="اكتب كلمة">
-<br>
-<button onclick="search()">بحث</button>
-
-<div id="result"></div>
-
-<br>
-<button onclick="pay()">Pay 0.01 Pi</button>
-
-<script>
-Pi.init({ version:"2.0", sandbox:true });
-
-let user = null;
-
-async function login(){
-user = await Pi.authenticate(['username']);
-alert("تم تسجيل الدخول");
-}
-
-const dictionary = {
-hello:"مرحبا",
-book:"كتاب",
-car:"سيارة"
-};
-
-function search(){
-let w = document.getElementById("word").value;
-document.getElementById("result").innerText =
-dictionary[w] || "الكلمة غير موجودة";
-}
-
-async function pay(){
-try{
-if(!user){
-alert("لازم تسجيل دخول");
-return;
-}
-
-const payment = await Pi.createPayment({
-amount:0.01,
-memo:"Dictionary access",
-metadata:{ type:"dictionary" }
-});
-
-alert("تم الدفع");
-console.log(payment);
-
-}catch(e){
-alert("خطأ دفع");
-console.log(e);
-}
 }
 </script>
 
