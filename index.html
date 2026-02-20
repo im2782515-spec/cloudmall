@@ -80,11 +80,30 @@ function pay() {
     metadata: { item: "dictionary" }
   };
   const callbacks = {
-    onReadyForServerApproval: (paymentId) => { console.log(paymentId); },
-    onReadyForServerCompletion: (paymentId, txid) => { console.log(paymentId, txid); },
-    onCancel: () => { alert("تم الغاء الدفع"); },
-    onError: (error) => { console.log(error); }
-  };
+  onReadyForServerApproval: async (paymentId) => {
+    try {
+      await fetch("/api/approve", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ paymentId })
+      });
+    } catch(e){
+      console.log(e);
+    }
+  },
+
+  onReadyForServerCompletion: (paymentId, txid) => {
+    console.log(paymentId, txid);
+  },
+
+  onCancel: () => {
+    alert("تم الغاء الدفع");
+  },
+
+  onError: (error) => {
+    console.log(error);
+  }
+};
   Pi.createPayment(paymentData, callbacks);
 }
 
