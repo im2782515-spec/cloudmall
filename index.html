@@ -1,67 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <title>Cloudmall Dictionary</title>
+
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<style>
+body{
+font-family:Arial;
+text-align:center;
+margin-top:40px;
+}
+input{
+width:80%;
+padding:10px;
+margin:10px;
+}
+button{
+padding:12px 20px;
+margin:10px;
+background:#4CAF50;
+color:white;
+border:none;
+border-radius:6px;
+}
+#result{
+margin-top:20px;
+font-size:20px;
+}
+</style>
 </head>
 
-<body style="font-family:Arial;text-align:center">
+<body>
 
 <h1>Cloudmall Dictionary</h1>
 
-<input id="search" placeholder="ابحث عن كلمة" style="padding:10px;width:80%">
+<button onclick="login()">Login Pi</button>
+<br>
+
+<input id="word" placeholder="اكتب كلمة">
+<br>
+<button onclick="search()">بحث</button>
+
 <div id="result"></div>
 
-<button onclick="pay()" style="margin-top:20px;padding:12px 25px;background:green;color:white;border:none">
-Pay 0.01 Pi
-</button>
+<br>
+<button onclick="pay()">Pay 0.01 Pi</button>
 
 <script>
 Pi.init({ version:"2.0", sandbox:true });
 
-fetch("words.json")
-.then(r=>r.json())
-.then(words=>{
-document.getElementById("search").oninput=(e)=>{
-const q=e.target.value.toLowerCase();
-const res=words.filter(w=>w.word.includes(q));
-document.getElementById("result").innerHTML=res.map(w=>`<p>${w.word} = ${w.meaning}</p>`).join("");
+let user = null;
+
+async function login(){
+user = await Pi.authenticate(['username']);
+alert("تم تسجيل الدخول");
 }
-})
+
+const dictionary = {
+hello:"مرحبا",
+book:"كتاب",
+car:"سيارة"
+};
+
+function search(){
+let w = document.getElementById("word").value;
+document.getElementById("result").innerText =
+dictionary[w] || "الكلمة غير موجودة";
+}
 
 async function pay(){
-await Pi.createPayment({
-  amount:0.01,
-  memo:"Cloudmall Dictionary",
-  metadata:{type:"test"}
-},{
-  onReadyForServerApproval: async (paymentId)=>{
-    await fetch("/approve",{method:"POST"});
-  },
-  onReadyForServerCompletion: async (paymentId)=>{
-    await fetch("/complete",{method:"POST"});
-  },
-  onCancel:(paymentId)=>{alert("cancel")},
-  onError:(error)=>{alert(JSON.stringify(error))}
+try{
+if(!user){
+alert("لازم تسجيل دخول");
+return;
+}
+
+const payment = await Pi.createPayment({
+amount:0.01,
+memo:"Dictionary access",
+metadata:{ type:"dictionary" }
 });
+
+alert("تم الدفع");
+console.log(payment);
+
+}catch(e){
+alert("خطأ دفع");
+console.log(e);
+}
 }
 </script>
 
 </body>
 </html>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
-<script>
-Pi.init({ version: "2.0", sandbox: true });
-
-async function login(){
-try{
-const user = await Pi.authenticate(['username']);
-alert("Login success: " + user.user.username);
-}catch(e){
-alert("Login failed");
-}
-}
-</script>
-<button onclick="login()">Login Pi</button>
