@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-<meta charset="UTF-8">
-<title>Cloudmall Dictionary</title>
-
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
-<style>
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <script>
 Pi.init({ version: "2.0", sandbox: true });
@@ -21,6 +12,22 @@ async function login() {
     alert("خطأ في تسجيل الدخول");
     console.error(err);
   }
+}
+
+function onIncompletePaymentFound(payment) {
+  console.log(payment);
+}
+</script>
+<button onclick="login()">Login Pi</button>
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>Cloudmall Dictionary</title>
+
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<style>
 }
 
 function onIncompletePaymentFound(payment) {
