@@ -1,177 +1,51 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cloudmall Dictionary</title>
-<style>
-body { font-family: Arial; text-align:center; padding:20px; background:#f4f4f9; }
-h1 { color:#333; }
-input, select { padding:10px; width:300px; margin:5px; border-radius:5px; border:1px solid #ccc; }
-ul { list-style:none; padding:0; max-width:500px; margin:auto; }
-li { padding:8px; background:#fff; margin-bottom:5px; border-radius:5px; text-align:left; box-shadow:0 0 5px rgba(0,0,0,0.1); }
-button { padding:10px 20px; font-size:16px; cursor:pointer; border:none; background:#4CAF50; color:white; border-radius:5px; }
-button:hover { background:#45a049; }
-</style>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
-<body>
+
+<body style="font-family:Arial;text-align:center">
 
 <h1>Cloudmall Dictionary</h1>
 
-<input type="text" id="searchBox" placeholder="ابحث عن كلمة...">
-<select id="categorySelect">
-  <option value="All">الكل</option>
-  <option value="Common">كلمات شائعة</option>
-  <option value="Tech">تقنية</option>
-  <option value="School">مدرسة</option>
-</select>
+<input id="search" placeholder="ابحث عن كلمة" style="padding:10px;width:80%">
+<div id="result"></div>
 
-<ul id="wordList"></ul>
-
-<button id="payBtn">Pay 0.01 Pi</button>
-
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<button onclick="pay()" style="margin-top:20px;padding:12px 25px;background:green;color:white;border:none">
+Pay 0.01 Pi
+</button>
 
 <script>
-Pi.init({ version: "2.0", sandbox: true });
+Pi.init({ version:"2.0", sandbox:true });
 
-// كلمات تجريبية
-const words = [
-  { word: "Hello", definition: "مرحبا", category: "Common" },
-  { word: "World", definition: "العالم", category: "Common" },
-  { word: "Book", definition: "كتاب", category: "School" },
-  { word: "Computer", definition: "حاسوب", category: "Tech" },
-  { word: "Phone", definition: "هاتف", category: "Tech" }
-];
-
-// دالة عرض الكلمات
-function displayWords(){
-  const search = document.getElementById("searchBox").value.toLowerCase();
-  const category = document.getElementById("categorySelect").value;
-  const list = document.getElementById("wordList");
-  list.innerHTML = "";
-  words
-    .filter(w => (category === "All" || w.category === category) &&
-                 w.word.toLowerCase().includes(search))
-    .forEach(w => {
-      const li = document.createElement("li");
-      li.textContent = ${w.word} : ${w.definition};
-      list.appendChild(li);
-    });
+fetch("words.json")
+.then(r=>r.json())
+.then(words=>{
+document.getElementById("search").oninput=(e)=>{
+const q=e.target.value.toLowerCase();
+const res=words.filter(w=>w.word.includes(q));
+document.getElementById("result").innerHTML=res.map(w=>`<p>${w.word} = ${w.meaning}</p>`).join("");
 }
+})
 
-// تفعيل البحث والتصنيف
-document.getElementById("searchBox").addEventListener("input", displayWords);
-document.getElementById("categorySelect").addEventListener("change", displayWords);
-
-// عرض الكلمات عند البداية
-displayWords();
-
-// زر الدفع
-document.getElementById("payBtn").addEventListener("click", async () => {
-  try {
-    await Pi.createPayment({
-      amount: 0.01,
-      memo: "Cloudmall Dictionary Test",
-      metadata: { type: "test" }
-    });
-    alert("نافذة الدفع فتحت، العملية تمت بنجاح");
-  } catch(e){
-    console.log(e);
-    alert("حدث خطأ في الدفع");
-  }
+async function pay(){
+await Pi.createPayment({
+  amount:0.01,
+  memo:"Cloudmall Dictionary",
+  metadata:{type:"test"}
+},{
+  onReadyForServerApproval: async (paymentId)=>{
+    await fetch("/approve",{method:"POST"});
+  },
+  onReadyForServerCompletion: async (paymentId)=>{
+    await fetch("/complete",{method:"POST"});
+  },
+  onCancel:(paymentId)=>{alert("cancel")},
+  onError:(error)=>{alert(JSON.stringify(error))}
 });
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cloudmall Dictionary</title>
-
-<style>
-body { font-family: Arial; text-align:center; padding:20px; background:#f4f4f9; }
-h1 { color:#333; margin-bottom:20px; }
-input, select { padding:10px; width:300px; margin:5px; border-radius:5px; border:1px solid #ccc; }
-ul { list-style:none; padding:0; max-width:600px; margin:auto; }
-li { padding:8px; background:#fff; margin-bottom:5px; border-radius:5px; text-align:left; box-shadow:0 0 5px rgba(0,0,0,0.1); }
-button { padding:10px 20px; font-size:16px; cursor:pointer; border:none; background:#4CAF50; color:white; border-radius:5px; }
-button:hover { background:#45a049; }
-</style>
-</head>
-<body>
-
-<h1>Cloudmall Dictionary</h1>
-
-<input type="text" id="searchBox" placeholder="ابحث عن كلمة...">
-<select id="categorySelect">
-  <option value="All">الكل</option>
-  <option value="Common">كلمات شائعة</option>
-  <option value="Tech">تقنية</option>
-  <option value="School">مدرسة</option>
-</select>
-
-<ul id="wordList"></ul>
-
-<button id="payBtn">Pay 0.01 Pi</button>
-
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
-<script>
-Pi.init({ version: "2.0", sandbox: true }); // sandbox للتجربة
-
-let words = [];
-
-async function loadWords(){
-  try {
-    const response = await fetch('words.json'); // تحميل الكلمات من الملف الخارجي
-    words = await response.json();
-    displayWords();
-  } catch(e){
-    console.log("Error loading words:", e);
-  }
 }
-
-// عرض الكلمات حسب البحث والتصنيف
-function displayWords(){
-  const search = document.getElementById("searchBox").value.toLowerCase();
-  const category = document.getElementById("categorySelect").value;
-  const list = document.getElementById("wordList");
-  list.innerHTML = "";
-  words
-    .filter(w => (category === "All" || w.category === category) &&
-                 w.word.toLowerCase().includes(search))
-    .forEach(w => {
-      const li = document.createElement("li");
-      li.textContent = ${w.word} : ${w.definition};
-      list.appendChild(li);
-    });
-}
-
-// تفعيل البحث والتصنيف
-document.getElementById("searchBox").addEventListener("input", displayWords);
-document.getElementById("categorySelect").addEventListener("change", displayWords);
-
-// تحميل الكلمات عند بداية الصفحة
-loadWords();
-
-// زر الدفع Pi
-document.getElementById("payBtn").addEventListener("click", async () => {
-  try {
-    await Pi.createPayment({
-      amount: 0.01,
-      memo: "Cloudmall Dictionary Test",
-      metadata: { type: "test" }
-    });
-    alert("نافذة الدفع فتحت، العملية تمت بنجاح");
-  } catch(e){
-    console.log(e);
-    alert("حدث خطأ في الدفع");
-  }
-});
 </script>
 
 </body>
