@@ -7,6 +7,26 @@
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
 <style>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+<script>
+Pi.init({ version: "2.0", sandbox: true });
+
+async function login() {
+  try {
+    const scopes = ['username', 'payments'];
+    const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
+    alert("تم تسجيل الدخول: " + auth.user.username);
+  } catch (err) {
+    alert("خطأ في تسجيل الدخول");
+    console.error(err);
+  }
+}
+
+function onIncompletePaymentFound(payment) {
+  console.log(payment);
+}
+</script>
 body{
 font-family:Arial;
 text-align:center;
