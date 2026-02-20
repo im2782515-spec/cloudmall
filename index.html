@@ -3,29 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <title>قاموسي</title>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<style>
+body { font-family: Arial; text-align:center; padding:40px; background:#f5f5f5; }
+input { padding:12px; width:80%; margin:10px; }
+button { padding:12px 20px; margin:10px; border:none; border-radius:8px; font-size:16px; cursor:pointer; }
+button.login { background:#4CAF50; color:white; }
+button.pay { background:#673ab7; color:white; }
+#result { font-size:22px; margin-top:20px; }
+#user { margin-top:20px; font-weight:bold; }
+</style>
 </head>
 
 <body>
 
 <h2>📘 القاموس</h2>
 
-<button onclick="login()">Login Pi</button>
+<button class="login" onclick="login()">Login Pi</button>
+<br>
+<button class="pay" onclick="pay()">ادفع 1 Pi</button>
 <br><br>
-<button onclick="pay()">ادفع 1 Pi</button>
-  <br><br>
+
 <input id="search" placeholder="اكتب كلمة">
 <button onclick="find()">بحث</button>
 <h3 id="result"></h3>
 
 <p id="user"></p>
 
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
 <script>
-Pi.init({ version: "2.0", sandbox: true });
-// Firebase configuration
+/* ===== Firebase Configuration ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyASAhqVjPc-Hb4gyMBlgiuTYYulOtUCrso",
   authDomain: "cloudmall-dictionary.firebaseapp.com",
@@ -38,6 +46,9 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+/* ===== Pi SDK Initialization ===== */
+Pi.init({ version: "2.0", sandbox: true });
 let currentUser = null;
 
 /* ===== LOGIN ===== */
@@ -45,11 +56,9 @@ async function login() {
   try {
     const scopes = ['username','payments'];
     const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-
     currentUser = auth.user;
     document.getElementById("user").innerText =
       "مرحبا " + auth.user.username;
-
   } catch (err) {
     alert("خطأ في تسجيل الدخول");
     console.log(err);
@@ -62,41 +71,34 @@ function pay() {
     alert("سجل دخول الاول");
     return;
   }
-
   const paymentData = {
     amount: 1,
     memo: "Unlock dictionary",
     metadata: { item: "dictionary" }
   };
-
   const callbacks = {
-    onReadyForServerApproval: (paymentId) => {
-      console.log(paymentId);
-    },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      console.log(paymentId, txid);
-    },
-    onCancel: () => {
-      alert("تم الغاء الدفع");
-    },
-    onError: (error) => {
-      console.log(error);
-    }
+    onReadyForServerApproval: (paymentId) => { console.log(paymentId); },
+    onReadyForServerCompletion: (paymentId, txid) => { console.log(paymentId, txid); },
+    onCancel: () => { alert("تم الغاء الدفع"); },
+    onError: (error) => { console.log(error); }
   };
-
   Pi.createPayment(paymentData, callbacks);
 }
 
 function onIncompletePaymentFound(payment) {
   console.log(payment);
 }
-</script>async function find(){
-  const word = document.getElementById("search").value;
 
+/* ===== SEARCH DICTIONARY ===== */
+async function find(){
+  const word = document.getElementById("search").value.trim();
+  if(!word){ 
+    document.getElementById("result").innerText = "اكتب كلمة أولاً"; 
+    return; 
+  }
   const snap = await db.collection("dictionary")
     .where("word","==", word)
     .get();
-
   if(snap.empty){
     document.getElementById("result").innerText = "الكلمة غير موجودة";
   } else {
@@ -105,6 +107,7 @@ function onIncompletePaymentFound(payment) {
     });
   }
 }
+</script>
 
 </body>
 </html>
