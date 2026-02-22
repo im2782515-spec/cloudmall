@@ -2,74 +2,78 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>قاموسي</title>
-
+<title>Lex English Arabic Dictionary</title>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
 <style>
 body{font-family:Arial;text-align:center;padding:40px;background:#f5f5f5}
-button{padding:12px 20px;margin:10px;border:none;border-radius:8px}
+button{padding:12px 20px;margin:10px;border:none;border-radius:8px;cursor:pointer}
+button.login{background:#4CAF50;color:white}
+button.pay{background:#673ab7;color:white}
+input{padding:12px;width:80%;margin:10px}
+#result{font-size:22px;margin-top:20px}
+#user{margin-top:20px;font-weight:bold}
 </style>
 </head>
 
 <body>
 
-<button onclick="login()">Login Pi</button>
+<h2>📘 القاموس</h2>
+
+<button class="login" onclick="login()">Login Pi</button>
 <p id="user"></p>
 
-<button onclick="pay()">ادفع 1 Pi</button>
-
-<br><br>
+<button class="pay" onclick="pay()">ادفع 1 Pi</button>
+<br>
 
 <input id="search" placeholder="اكتب كلمة" disabled>
 <button id="searchBtn" onclick="find()" disabled>بحث</button>
-
 <h3 id="result"></h3>
 
 <script>
-Pi.init({version:"2.0",sandbox:true});
-let currentUser=null;
+Pi.init({version:"2.0", sandbox:false}); // حط true لو اختبار، false للإنتاج
+let currentUser = null;
 
 async function login(){
- try{
-  const scopes=['username','payments'];
-  const auth=await Pi.authenticate(scopes,onIncompletePaymentFound);
-
-  currentUser=auth.user;
-
-  document.getElementById("user").innerText="مرحبا "+auth.user.username;
-
-  document.getElementById("search").disabled=false;
-  document.getElementById("searchBtn").disabled=false;
-
- }catch(e){alert("login error");console.log(e);}
+  try{
+    const scopes = ['username','payments'];
+    const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
+    currentUser = auth.user;
+    document.getElementById("user").innerText = "مرحبا "+auth.user.username;
+    document.getElementById("search").disabled = false;
+    document.getElementById("searchBtn").disabled = false;
+  }catch(err){
+    alert("خطأ في تسجيل الدخول");
+    console.log(err);
+  }
 }
 
 function pay(){
- if(!currentUser){alert("سجل دخول الاول");return;}
+  if(!currentUser){ alert("سجل دخول الاول"); return; }
 
- const paymentData={amount:1,memo:"dictionary",metadata:{item:"dictionary"}};
+  const paymentData = {
+    amount:1,
+    memo:"dictionary",
+    metadata:{item:"dictionary"}
+  };
 
- const callbacks={
-  onReadyForServerApproval:(paymentId)=>{
-   fetch("/api/approve",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId})});
-  },
-  onReadyForServerCompletion:(paymentId,txid)=>{
-   fetch("/api/complete",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId,txid})});
-  },
-  onCancel:()=>alert("cancel"),
-  onError:(e)=>console.log(e)
- };
+  const callbacks = {
+    onReadyForServerApproval: async (paymentId)=>{
+      await fetch("/api/approve",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId})});
+    },
+    onReadyForServerCompletion: async (paymentId,txid)=>{
+      await fetch("/api/complete",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId,txid})});
+    },
+    onCancel: ()=>alert("تم الغاء الدفع"),
+    onError: (err)=>console.log(err)
+  };
 
- Pi.createPayment(paymentData,callbacks);
+  Pi.createPayment(paymentData, callbacks);
 }
 
-function onIncompletePaymentFound(payment){
- console.log(payment);
-}
+function onIncompletePaymentFound(payment){ console.log(payment); }
 
 function find(){
- document.getElementById("result").innerText="سيظهر المعنى هنا";
+  document.getElementById("result").innerText="سيظهر المعنى هنا";
 }
 </script>
 
