@@ -10,7 +10,8 @@
 
 <script>
 let currentUser = null;
-</scrasync function login(){
+
+async function login(){
   const scopes = ['username','payments'];
   const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
   currentUser = auth.user;
@@ -20,38 +21,9 @@ let currentUser = null;
 
   document.getElementById("search").disabled = false;
   document.getElementById("searchBtn").disabled = false;
-}ifunction pay(){
-  if(!currentUser){
-    alert("سجل دخول الاول");
-    return;
-  }
+}
 
-  const paymentData = {
-    amount:1,
-    memo:"Unlock dictionary",
-    metadata:{item:"dictionary"}
-  };
-
-  const callbacks = {
-    onReadyForServerApproval: async (paymentId)=>{
-      await fetch("/api/approve",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({paymentId})
-      });
-    },
-
-    onReadyForServerCompletion: async (paymentId,txid)=>{
-      await fetch("/api/complete",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({paymentId,txid})
-      });
-    },
-
-    onCancel:()=>alert("تم الغاء الدفع"),
-    onError:(err)=>console.log(err)
-  };
-
-  Pi.createPayment(paymentData,callbacks);
-}pt>
+function onIncompletePaymentFound(payment){
+  console.log(payment);
+}
+</script>
