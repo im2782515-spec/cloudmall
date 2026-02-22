@@ -30,43 +30,33 @@ input{padding:12px;width:80%;margin:10px}
 <h3 id="result"></h3>
 
 <script>
-Pi.init({version:"2.0", sandbox:true}); // حط true لو اختبار، false للإنتاج
+Pi.init({ version: "2.0", sandbox: true }); // تجربة Sandbox
 let currentUser = null;
 
-async function login(){
-  try{
+async function login() {
+  try {
     const scopes = ['username','payments'];
     const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
     currentUser = auth.user;
-    document.getElementById("user").innerText = "مرحبا "+auth.user.username;
+    document.getElementById("user").innerText = "مرحبا " + auth.user.username;
     document.getElementById("search").disabled = false;
     document.getElementById("searchBtn").disabled = false;
-  }catch(err){
+  } catch(err) {
     alert("خطأ في تسجيل الدخول");
     console.log(err);
   }
 }
 
-function pay(){
+function pay() {
   if(!currentUser){ alert("سجل دخول الاول"); return; }
 
-  const paymentData = {
-    amount:1,
-    memo:"dictionary",
-    metadata:{item:"dictionary"}
-  };
-
+  const paymentData = { amount:1, memo:"dictionary", metadata:{item:"dictionary"} };
   const callbacks = {
-    onReadyForServerApproval: async (paymentId)=>{
-      await fetch("/api/approve",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId})});
-    },
-    onReadyForServerCompletion: async (paymentId,txid)=>{
-      await fetch("/api/complete",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId,txid})});
-    },
+    onReadyForServerApproval: (paymentId)=>console.log(paymentId),
+    onReadyForServerCompletion: (paymentId, txid)=>console.log(paymentId, txid),
     onCancel: ()=>alert("تم الغاء الدفع"),
     onError: (err)=>console.log(err)
   };
-
   Pi.createPayment(paymentData, callbacks);
 }
 
