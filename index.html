@@ -41,6 +41,14 @@ async function login() {
     document.getElementById("user").innerText = "مرحبا " + auth.user.username;
     document.getElementById("search").disabled = false;
     document.getElementById("searchBtn").disabled = false;
+
+    // ارسال بيانات تسجيل الدخول للـ backend
+    await fetch("/api/signin", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ authResult: auth })
+    });
+
   } catch(err) {
     alert("خطأ في تسجيل الدخول");
     console.log(err);
@@ -52,18 +60,27 @@ function pay() {
 
   const paymentData = { amount:1, memo:"dictionary", metadata:{item:"dictionary"} };
   const callbacks = {
-    onReadyForServerApproval: (paymentId)=>console.log(paymentId),
-    onReadyForServerCompletion: (paymentId, txid)=>console.log(paymentId, txid),
+    onReadyForServerApproval: async (paymentId)=>{
+      await fetch("/api/approve",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId})});
+    },
+    onReadyForServerCompletion: async (paymentId, txid)=>{
+      await fetch("/api/complete",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId,txid})});
+    },
     onCancel: ()=>alert("تم الغاء الدفع"),
     onError: (err)=>console.log(err)
   };
   Pi.createPayment(paymentData, callbacks);
 }
 
-function onIncompletePaymentFound(payment){ console.log(payment); }
+function onIncompletePaymentFound(payment){
+  fetch("/api/incomplete", {method:"POST", headers:{'Content-Type':'application/json'}, body:JSON.stringify({payment})})
+    .then(res=>res.json())
+    .then(console.log)
+    .catch(console.error);
+}
 
 function find(){
-  document.getElementById("result").innerText="سيظهر المعنى هنا";
+  document.getElementById("result").innerText="سيظهر المعنى هنا بعد الدفع";
 }
 </script>
 
