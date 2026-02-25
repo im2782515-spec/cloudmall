@@ -9,6 +9,8 @@ app.post("/api/complete", require("./api/complete"));
 app.post("/api/signin", require("./api/signin"));
 app.post("/api/incomplete", require("./api/incomplete"));
 const path = require("path");
-
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend/index.html"));
+});
 app.use(express.static(path.join(__dirname,"frontend")));
 app.listen(3000, () => console.log("Server running on port 3000"));
