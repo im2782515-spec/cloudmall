@@ -7,7 +7,7 @@ async function login(){
 
 function pay(){
  Pi.createPayment(
-  {amount:1,memo:"dictionary",metadata:{}},
+  {amount:0.1,memo:"dictionary",metadata:{}},
   {
    onReadyForServerApproval:id=>{
     fetch("/api/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id})});
