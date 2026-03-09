@@ -1,16 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Dictionary</title>
+<meta charset="UTF-8">
+<title>Pi Dictionary</title>
+
+<style>
+body{
+font-family: Arial;
+text-align:center;
+background:#f4f4f4;
+}
+
+.container{
+margin-top:60px;
+}
+
+input{
+padding:10px;
+width:250px;
+font-size:16px;
+}
+
+button{
+padding:10px 20px;
+margin:10px;
+font-size:16px;
+cursor:pointer;
+}
+
+#result{
+margin-top:20px;
+font-size:20px;
+font-weight:bold;
+}
+</style>
+
 </head>
+
 <body>
 
-<h1>Dictionary</h1>
+<div class="container">
 
-<button onclick="login()">Login Pi</button>
-<button onclick="pay()">Pay</button>
+<h1>📚 Pi Dictionary</h1>
+
+<button onclick="login()">Login with Pi</button>
+
+<br><br>
+
+<input id="word" placeholder="Enter word">
+
+<br>
+
+<button onclick="searchWord()">Search</button>
+
+<div id="result"></div>
+
+<br>
+
+<button onclick="pay()">Pay 1 Pi</button>
+
+</div>
 
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
